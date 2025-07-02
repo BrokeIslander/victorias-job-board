@@ -1,0 +1,7 @@
+# Ignore server dependencies and secrets
+/server/node_modules/
+server/.env
+
+# Ignore frontend build and dependencies
+/client/node_modules/
+client/dist/
