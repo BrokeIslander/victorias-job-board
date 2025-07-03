@@ -3,26 +3,35 @@ import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import authRoutes from './routes/Auth.js'
 
 dotenv.config()
 
 const app = express()
+
+// Middleware
 app.use(cors())
 app.use(express.json())
 
-// Test Route
+// Debug: check env
+console.log('✅ Mongo URI:', process.env.MONGO_URI)
+
+// Routes
+app.use('/api/auth', authRoutes)
+
+// Optional test route
 app.get('/api/jobs', (req, res) => {
   res.json([
-    { id: 1, title: 'Barista - Victorias Mall', company: 'Cafe Uno' },
-    { id: 2, title: 'Delivery Rider', company: 'FoodTrip' } 
+    { id: 1, title: 'Barista', company: 'Cafe Uno' },
+    { id: 2, title: 'Delivery Rider', company: 'FoodTrip' }
   ])
 })
 
-// Connect to MongoDB
+// MongoDB connect
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB connected')
-    app.listen(process.env.PORT, () => {
+    app.listen(process.env.PORT || 5000, () => {
       console.log(`🚀 Server running at http://localhost:${process.env.PORT}`)
     })
   })
