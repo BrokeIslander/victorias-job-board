@@ -8,7 +8,7 @@ import Jobs from './pages/Jobs'
 import PostJob from './components/PostJob'
 import JobList from './components/JobList'
 import Login from './pages/Login'
-
+import Register from './pages/Register'
 const user = JSON.parse(localStorage.getItem("user"))
 function App() {
   return (
@@ -30,6 +30,7 @@ function App() {
   ) : (
     <Link to="/login" className="hover:underline">Login</Link>
   )}
+  <Link to="/register" className="hover:underline">Register</Link>
 </nav>
 
 
@@ -38,6 +39,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </div>
     </Router>

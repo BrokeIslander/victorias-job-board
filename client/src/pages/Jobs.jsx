@@ -5,7 +5,9 @@ import PostJob from '../components/PostJob'
 export default function Jobs() {
   const [jobs, setJobs] = useState([])
 
-  // Check if logged in as employer (optional)
+  const user = JSON.parse(localStorage.getItem('user')) // ✅ added this
+
+  // Check if logged in as employer
   const isEmployer = () => {
     try {
       const token = localStorage.getItem('token')
@@ -40,7 +42,28 @@ export default function Jobs() {
             <h3 className="text-xl font-bold">{job.title}</h3>
             <p className="text-gray-600">{job.company}</p>
             <p className="text-sm">{job.description}</p>
-            <p className="text-sm text-gray-500">📍 {job.location} | 💰 {job.salary} PHP</p>
+            <p className="text-sm text-gray-500">
+              📍 {job.location} | 💰 {job.salary} PHP
+            </p>
+
+            {/* ✅ Show Apply button for applicants only */}
+            {user?.role === 'applicant' && (
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await axios.post(`http://localhost:5000/api/apply/${job._id}`, {}, {
+                      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    })
+                    alert(res.data.message)
+                  } catch (err) {
+                    alert(err.response?.data?.message || 'Error applying')
+                  }
+                }}
+                className="mt-2 bg-blue-500 text-white px-3 py-1 rounded"
+              >
+                Apply
+              </button>
+            )}
           </li>
         ))}
       </ul>

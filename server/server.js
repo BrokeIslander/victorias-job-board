@@ -5,6 +5,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import authRoutes from './routes/Auth.js'
 import jobRoutes from './routes/Job.js'
+import applicationRoutes from './routes/Application.js'
 dotenv.config()
 
 const app = express()
@@ -19,6 +20,8 @@ console.log('✅ Mongo URI:', process.env.MONGO_URI)
 // Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/jobs', jobRoutes)
+app.use('/api/apply', applicationRoutes)
+
 // Optional test route
 app.get('/api/jobs', (req, res) => {
   res.json([
