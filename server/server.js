@@ -6,6 +6,8 @@ import dotenv from 'dotenv'
 import authRoutes from './routes/Auth.js'
 import jobRoutes from './routes/Job.js'
 import applicationRoutes from './routes/Application.js'
+
+
 dotenv.config()
 
 const app = express()

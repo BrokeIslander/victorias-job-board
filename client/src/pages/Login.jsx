@@ -24,7 +24,7 @@ export default function Login() {
       localStorage.setItem('user', JSON.stringify(user))
 
       alert('Login successful!')
-      navigate('/jobs') // redirect after login
+      navigate('/dashboard') // redirect after login
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed')
     }

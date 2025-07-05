@@ -37,4 +37,28 @@ router.post('/:jobId', authMiddleware, async (req, res) => {
   }
 })
 
+// Get all applications for the logged-in applicant
+router.get('/my', authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== 'applicant') {
+      return res.status(403).json({ message: 'Only applicants can view applications' })
+    }
+
+    const applications = await Application.find({ applicantId: req.user.id }).populate('jobId')
+
+    const jobs = applications.map(app => ({
+      id: app.jobId._id,
+      title: app.jobId.title,
+      company: app.jobId.company,
+      location: app.jobId.location,
+      salary: app.jobId.salary,
+      appliedAt: app.date
+    }))
+
+    res.json(jobs)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router
