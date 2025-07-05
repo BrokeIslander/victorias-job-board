@@ -16,6 +16,8 @@ import MyApplications from './pages/MyApplications'
 import ProtectedRoute from './components/ProtectedRoute'
 import Dashboard from './pages/Dashboard'
 import './index.css'
+import VHireLogo from './assets/VCHire_logo.png';
+
 
 function Nav({ user, setUser }) {
   const location = useLocation()
@@ -55,16 +57,13 @@ function Nav({ user, setUser }) {
   <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
 
     {/* ─── Logo / Brand ─── */}
-    <Link to="/" className="flex items-center gap-3 select-none">
-      <div className="p-2 bg-gray-700 rounded-lg">
-        <Briefcase className="h-6 w-6 text-gray-100" />
-      </div>
-      <span className="text-lg font-semibold tracking-wide text-gray-100">
-        Victorias Job Board
-      </span>
-    </Link>
+   <Link to="/" className="flex items-center gap-2 hover:scale-105 transition duration-300 ease-out">
+  <img src={VHireLogo} alt="VHire Logo" className="h-8 w-8 rounded-full" />
+  <span className="text-xl font-bold text-white">VCHire</span>
+</Link>
 
-    {/* ─── Desktop Links ─── */}
+
+    {/* ── Desktop Links ─── */}
     <nav className="hidden md:flex items-center gap-3 text-sm">
       {user ? (
         <>
