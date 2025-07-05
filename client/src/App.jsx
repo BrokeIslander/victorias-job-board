@@ -26,8 +26,17 @@ function Nav({ user, setUser }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleLogout = () => {
+    // Clear local storage
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+
+    // Clear app state
     setUser(null)
+
+    // Navigate home
     navigate('/')
+
+    // Close mobile menu (optional)
     setIsMobileMenuOpen(false)
   }
 
@@ -159,9 +168,26 @@ function App() {
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-    const stored = localStorage.getItem('user')
-    if (stored) setUser(JSON.parse(stored))
-  }, [])
+  // Step 1: On initial mount, load user from localStorage
+  const storedUser = localStorage.getItem('user')
+  if (storedUser) {
+    setUser(JSON.parse(storedUser))
+  }
+
+  // Step 2: Sync across tabs (but don't trigger on first load)
+  const handleStorageChange = (e) => {
+    if (e.key === 'user') {
+      if (e.newValue) {
+        setUser(JSON.parse(e.newValue))
+      } else {
+        setUser(null)
+      }
+    }
+  }
+
+  window.addEventListener('storage', handleStorageChange)
+  return () => window.removeEventListener('storage', handleStorageChange)
+}, [])
 
   return (
     <Router>

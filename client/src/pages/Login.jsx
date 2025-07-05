@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
-export default function Login() {
+export default function Login({ setUser }) { // <-- make sure setUser is here
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const navigate = useNavigate()
@@ -22,6 +22,7 @@ export default function Login() {
       localStorage.setItem('token', token)
       localStorage.setItem('user', JSON.stringify(user))
 
+      setUser(user) // ✅ this sets the user in App
       alert('Login successful!')
       navigate('/dashboard')
     } catch (err) {
