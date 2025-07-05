@@ -173,7 +173,7 @@ function App() {
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
           </div>
           
-          <div className="relative z-10 p-6 max-w-6xl mx-auto min-h-[calc(100vh-6rem)]">
+          <div className="relative z-10 p-0 max-w-6xl mx-auto min-h-[calc(100vh-6rem)]">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/jobs" element={<Jobs />} />
