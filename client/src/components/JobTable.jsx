@@ -58,7 +58,7 @@ export default function JobTable({ openEdit }) {
     { name: 'Title', selector: r => r.title, sortable: true, wrap: true },
     { name: 'Company', selector: r => r.company, sortable: true },
     { name: 'Location', selector: r => r.location, sortable: true },
-    { name: 'Daily Salary', selector: r => r.salary, sortable: true, right: true },
+    { name: 'Daily Salary', selector: r => r.salary, sortable: true,},
     {
       name: 'Info / Details',
       cell: row => (
