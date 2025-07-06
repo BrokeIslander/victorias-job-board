@@ -1,13 +1,16 @@
-import { useEffect, useState } from 'react'
-import axios from 'axios'
-import PostJobModal from '../components/PostJobModal'
+import { useState, useCallback } from 'react'
 import { Plus } from 'lucide-react'
+import PostJobModal from '../components/PostJobModal'
+import JobTable from '../components/JobTable'
 
 export default function Jobs() {
-  const [jobs, setJobs] = useState([])
   const [showPostModal, setShowPostModal] = useState(false)
+  const [editJob, setEditJob] = useState(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
-  const user = JSON.parse(localStorage.getItem('user'))
+  const refreshTable = useCallback(() => {
+    setRefreshKey((k) => k + 1)
+  }, [])
 
   const isEmployer = () => {
     try {
@@ -20,22 +23,9 @@ export default function Jobs() {
     }
   }
 
-  const fetchJobs = async () => {
-    try {
-      const res = await axios.get('http://localhost:5000/api/jobs')
-      setJobs(res.data)
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  useEffect(() => {
-    fetchJobs()
-  }, [])
-
   return (
-    <div className="max-w-5xl mx-auto mt-10 px-4">
-      <div className="flex justify-between items-center mb-6">
+    <div className="max-w-6xl mx-auto mt-10 px-4">
+      <div className="flex justify-between items-center mb-6 sticky top-0 bg-white z-10 py-4">
         <h2 className="text-3xl font-bold text-gray-800">📋 Job Listings</h2>
 
         {isEmployer() && (
@@ -48,64 +38,33 @@ export default function Jobs() {
         )}
       </div>
 
-      {jobs.length === 0 ? (
-        <p className="text-gray-500 text-center">No job listings available at the moment.</p>
-      ) : (
-        <div className="grid md:grid-cols-2 gap-6">
-          {jobs.map((job) => (
-            <div
-              key={job._id}
-              className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300"
-            >
-              <div className="mb-2">
-                <h3 className="text-xl font-semibold text-gray-800">{job.title}</h3>
-                <p className="text-sm text-gray-500">{job.company}</p>
-              </div>
+      {/* SINGLE JobTable */}
+      <JobTable key={refreshKey} openEdit={setEditJob} />
 
-              <p className="text-gray-700 mb-3 line-clamp-3">{job.description}</p>
-
-              <div className="text-sm text-gray-500 flex flex-wrap gap-4 mb-3">
-                <span>📍 {job.location}</span>
-                <span>💰 {job.salary} PHP</span>
-              </div>
-
-              {user?.role === 'applicant' && (
-                <button
-                  onClick={async () => {
-                    try {
-                      const res = await axios.post(
-                        `http://localhost:5000/api/apply/${job._id}`,
-                        {},
-                        {
-                          headers: {
-                            Authorization: `Bearer ${localStorage.getItem('token')}`,
-                          },
-                        }
-                      )
-                      alert(res.data.message)
-                    } catch (err) {
-                      alert(err.response?.data?.message || 'Error applying')
-                    }
-                  }}
-                  className="mt-2 w-full text-center bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-medium transition"
-                >
-                  Apply
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
+      {/* Post Modal */}
+      {showPostModal && (
+        <PostJobModal
+          open={true}
+          onClose={() => setShowPostModal(false)}
+          onSuccess={() => {
+            setShowPostModal(false)
+            refreshTable()
+          }}
+        />
       )}
 
-      {/* Post Job Modal */}
-      <PostJobModal
-        open={showPostModal}
-        onClose={() => setShowPostModal(false)}
-        onSuccess={() => {
-          setShowPostModal(false)
-          fetchJobs()
-        }}
-      />
+      {/* Edit Modal */}
+      {editJob && (
+        <PostJobModal
+          open={true}
+          initialData={editJob}
+          onClose={() => setEditJob(null)}
+          onSuccess={() => {
+            setEditJob(null)
+            refreshTable()
+          }}
+        />
+      )}
     </div>
   )
 }

@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import axios from 'axios'
 
-export default function PostJobModal({ open, onClose, onSuccess }) {
-  if (!open) return null 
+export default function PostJobModal({ open, onClose, onSuccess, initialData }) {
+  const isEdit = Boolean(initialData)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -16,32 +16,47 @@ export default function PostJobModal({ open, onClose, onSuccess }) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        title: initialData.title || '',
+        company: initialData.company || '',
+        location: initialData.location || '',
+        salary: initialData.salary || '',
+        description: initialData.description || ''
+      })
+    }
+  }, [initialData])
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
   const handleSubmit = async (e) => {
-  e.preventDefault()
-  setError('')
-  setLoading(true)
+    e.preventDefault()
+    setError('')
+    setLoading(true)
 
-  try {
-    const token = localStorage.getItem('token')
-    await axios.post(
-      'http://localhost:5000/api/jobs',
-      formData,
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
+    try {
+      const token = localStorage.getItem('token')
+      const config = { headers: { Authorization: `Bearer ${token}` } }
 
-    onSuccess() // ✅ Correct prop callback to refresh the list
-    onClose()
-  } catch (err) {
-    setError(err.response?.data?.message || 'Failed to post job')
-  } finally {
-    setLoading(false)
+      if (isEdit) {
+        await axios.put(`http://localhost:5000/api/jobs/${initialData._id}`, formData, config)
+      } else {
+        await axios.post('http://localhost:5000/api/jobs', formData, config)
+      }
+
+      onSuccess()
+      onClose()
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to submit job')
+    } finally {
+      setLoading(false)
+    }
   }
-}
 
+  if (!open) return null
 
   return (
     <>
@@ -61,7 +76,9 @@ export default function PostJobModal({ open, onClose, onSuccess }) {
             <X />
           </button>
 
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Post a New Job</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">
+            {isEdit ? 'Edit Job' : 'Post a New Job'}
+          </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
@@ -117,7 +134,7 @@ export default function PostJobModal({ open, onClose, onSuccess }) {
               disabled={loading}
               className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition font-semibold"
             >
-              {loading ? 'Posting...' : 'Post Job'}
+              {loading ? (isEdit ? 'Updating…' : 'Posting…') : isEdit ? 'Update Job' : 'Post Job'}
             </button>
           </form>
         </div>
