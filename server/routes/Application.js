@@ -1,7 +1,7 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
 import Application from '../models/Application.js'
-
+import upload from '../middleware/upload.js'
 const router = express.Router()
 
 // Middleware to extract user from token
@@ -18,16 +18,16 @@ const authMiddleware = (req, res, next) => {
   }
 }
 
-// Apply for a job
-router.post('/:jobId', authMiddleware, async (req, res) => {
+// POST /api/apply/:jobId  (with résumé upload)
+router.post('/:jobId', authMiddleware, upload.single('resume'), async (req, res) => {
   try {
-    if (req.user.role !== 'applicant') {
+    if (req.user.role !== 'applicant')
       return res.status(403).json({ message: 'Only applicants can apply' })
-    }
 
     const application = new Application({
       jobId: req.params.jobId,
-      applicantId: req.user.id
+      applicantId: req.user.id,
+      resumePath: req.file?.path,   // save file path
     })
 
     await application.save()

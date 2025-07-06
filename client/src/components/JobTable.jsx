@@ -4,6 +4,7 @@ import axios from 'axios'
 import { Trash2, Edit, Send, Eye, Search, MapPin, Building2, DollarSign, Calendar, Users } from 'lucide-react'
 import JobDetailModal from './JobDetailModal'
 import config from '../config'
+import ApplicationModal from './ApplicationModal'
 
 const { API_BASE_URL } = config
 /* ─── Enhanced Custom RDT theme ─── */
@@ -69,16 +70,7 @@ export default function JobTable({ openEdit, compact = false }) {
     user?.role === 'admin' ||
     (user?.role === 'employer' && row.postedBy?._id === user.id)
 
-  /* ─── Handlers ────────────────── */
-  const handleApply = async id => {
-    try {
-      const token = localStorage.getItem('token')
-      await axios.post(`${API_BASE_URL}/api/apply/${id}`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      alert('Applied successfully! 🎉')
-    } catch (e) { alert(e.response?.data?.message || 'Error applying to job') }
-  }
+
 
   const handleDelete = async id => {
     if (!window.confirm('Are you sure you want to delete this job posting?')) return
@@ -184,7 +176,7 @@ export default function JobTable({ openEdit, compact = false }) {
           {user?.role === 'applicant' && (
             <button
               title="Apply Now"
-              onClick={() => handleApply(row._id)}
+              onClick={() => setSelectedJob(row)}
               className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-800 transition-all duration-200 hover:scale-105"
             >
               <Send size={16} />
@@ -276,6 +268,14 @@ export default function JobTable({ openEdit, compact = false }) {
       {selectedJob && (
         <JobDetailModal job={selectedJob} onClose={() => setSelectedJob(null)} />
       )}
+
+      {selectedJob && (
+        <ApplicationModal
+            job={selectedJob}
+            onClose={() => setSelectedJob(null)}
+            onSuccess={fetchJobs}   // optional refresh
+        />
+        )}
     </div>
   )
 }

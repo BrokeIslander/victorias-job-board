@@ -14,7 +14,8 @@ const applicationSchema = new mongoose.Schema({
   date: {
     type: Date,
     default: Date.now
-  }
+  },
+  resumePath: { type: String },
 })
 
 export default mongoose.model('Application', applicationSchema)
