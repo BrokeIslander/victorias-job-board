@@ -1,2 +1,60 @@
 @import "tailwindcss";
 
+/* ─── React‑Data‑Table (global) ─────────────────────────── */
+@layer components {
+  /* Table wrapper */
+  .rdt_Table {
+    @apply rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-white;
+  }
+
+  /* Header container */
+  .rdt_TableHead {
+    @apply bg-white;
+  }
+
+  /* Header row */
+  .rdt_TableHeadRow {
+    @apply bg-gray-50 border-b-2 border-gray-200;
+  }
+
+  /* Header cells */
+  .rdt_TableCol,
+  .rdt_TableCol_Sortable {
+    @apply text-xs font-bold uppercase tracking-wider text-gray-700 px-4 py-3;
+  }
+  .rdt_TableCol_Sortable {
+    @apply cursor-pointer select-none;
+  }
+
+  /* Body rows */
+  .rdt_TableRow {
+    @apply border-b border-gray-100 transition-all duration-150 hover:bg-gray-50;
+  }
+  /* Striped effect */
+  .rdt_TableRow:nth-child(odd) {
+    @apply bg-gray-50/50;
+  }
+
+  /* Cells */
+  .rdt_TableCell {
+    @apply text-sm px-4 py-3;
+  }
+
+  /* Pagination */
+  .rdt_Pagination {
+    @apply flex items-center justify-between gap-4 text-sm bg-white border-t border-gray-200 px-4 py-4 rounded-b-xl;
+  }
+  .rdt_Pagination button {
+    @apply h-9 min-w-[2.5rem] px-2 rounded-md border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:text-gray-300 disabled:border-gray-100;
+  }
+}
+
+/* ─── Utility: Table progress & empty states ────────────── */
+@layer utilities {
+  .rdt-loader {
+    @apply py-12 flex items-center justify-center text-gray-600;
+  }
+  .rdt-no-data {
+    @apply py-12 flex flex-col items-center justify-center text-center text-gray-500;
+  }
+}

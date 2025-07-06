@@ -24,14 +24,6 @@ app.use('/api/auth', authRoutes)
 app.use('/api/jobs', jobRoutes)
 app.use('/api/apply', applicationRoutes)
 
-// Optional test route
-app.get('/api/jobs', (req, res) => {
-  res.json([
-    { id: 1, title: 'Barista', company: 'Cafe Uno' },
-    { id: 2, title: 'Delivery Rider', company: 'FoodTrip' }
-  ])
-})
-
 // MongoDB connect
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {

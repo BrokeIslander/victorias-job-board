@@ -1,5 +1,7 @@
 import { useState } from "react"
+import config from '../config'
 
+const { API_BASE_URL } = config
 const PostJob = () => {
   const [formData, setFormData] = useState({
     title: "",
@@ -20,7 +22,7 @@ const PostJob = () => {
     if (!token) return alert("Please log in as employer first")
 
     try {
-      const res = await fetch("http://localhost:5000/api/jobs", {
+      const res = await fetch(`${API_BASE_URL}/api/jobs`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

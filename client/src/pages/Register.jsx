@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import config from '../config'
+
+const { API_BASE_URL } = config
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -21,7 +24,7 @@ export default function Register() {
     setError('')
 
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/register', formData)
+      const res = await axios.post(`${API_BASE_URL}/api/auth/register`, formData)
       alert(res.data.message)
       navigate('/login')
     } catch (err) {

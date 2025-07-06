@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import axios from 'axios'
+import config from '../config'
+
+const { API_BASE_URL } = config
 
 export default function PostJobModal({ open, onClose, onSuccess, initialData }) {
   const isEdit = Boolean(initialData)
@@ -42,9 +45,9 @@ export default function PostJobModal({ open, onClose, onSuccess, initialData }) 
       const config = { headers: { Authorization: `Bearer ${token}` } }
 
       if (isEdit) {
-        await axios.put(`http://localhost:5000/api/jobs/${initialData._id}`, formData, config)
+        await axios.put(`${API_BASE_URL}/api/jobs/${initialData._id}`, formData, config)
       } else {
-        await axios.post('http://localhost:5000/api/jobs', formData, config)
+        await axios.post(`${API_BASE_URL}/api/jobs`, formData, config)
       }
 
       onSuccess()

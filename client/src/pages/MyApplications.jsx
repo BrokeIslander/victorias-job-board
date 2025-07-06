@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import config from '../config'
+
+const { API_BASE_URL } = config
 
 export default function MyApplications() {
   const [applications, setApplications] = useState([])
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/apply/my', {
+    axios.get(`${API_BASE_URL}/api/apply/my`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }

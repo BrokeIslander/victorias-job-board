@@ -16,7 +16,8 @@ import MyApplications from './pages/MyApplications'
 import ProtectedRoute from './components/ProtectedRoute'
 import Dashboard from './pages/Dashboard'
 import './index.css'
-import VHireLogo from './assets/VCHire_logo.png';
+import VHireLogo from './assets/VCHire_logo.png'
+import config from './config'
 
 
 function Nav({ user, setUser }) {
