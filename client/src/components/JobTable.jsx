@@ -39,6 +39,7 @@ export default function JobTable({ openEdit, compact = false }) {
   const [jobs, setJobs] = useState([])
   const [search, setSearch] = useState('')
   const [selectedJob, setSelectedJob] = useState(null)
+  const [applyingJob, setApplyingJob] = useState(null)
   const [loading, setLoading] = useState(false)
   const user = JSON.parse(localStorage.getItem('user') || 'null')
 
@@ -100,112 +101,149 @@ export default function JobTable({ openEdit, compact = false }) {
   }
 
   /* ─── Enhanced Column Def ──────────────── */
-  const columns = [
-    {
-      name: 'Job Title',
-      selector: r => r.title,
-      sortable: true,
-      wrap: true,
-      width: '280px',
-      cell: row => (
-        <div className="py-2">
-          <div className="font-semibold text-gray-900 text-sm leading-tight">
-            {row.title}
-          </div>
-          <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
-            <Building2 size={12} />
-            <span>{row.company}</span>
-          </div>
-        </div>
-      ),
-    },
-    {
-      name: 'Location',
-      selector: r => r.location,
-      sortable: true,
-      width: '160px',
-      cell: row => (
-        <div className="flex items-center gap-1 text-sm text-gray-600">
-          <MapPin size={14} className="text-gray-400" />
-          <span>{row.location}</span>
-        </div>
-      ),
-    },
-    {
-      name: 'Daily Salary',
-      selector: r => r.salary,
-      sortable: true,
-      width: '140px',
-      cell: row => (
-        <div className="flex items-center gap-1">
-          <DollarSign size={14} className="text-green-500" />
-          <span className="font-medium text-green-700 text-sm">
-            {formatSalary(row.salary)}
-          </span>
-        </div>
-      ),
-    },
-    {
-      name: 'Posted',
-      selector: r => r.createdAt,
-      sortable: true,
-      width: '120px',
-      cell: row => (
-        <div className="flex items-center gap-1 text-sm text-gray-600">
-          <Calendar size={14} className="text-gray-400" />
-          <span>{formatDate(row.datePosted)}</span>
-        </div>
-      ),
-    },
-    {
-      name: 'Actions',
-     
-      width: '140px',
-      cell: row => (
-        <div className="flex items-center gap-1">
-          {/* View Details */}
-          <button
-            title="View Details"
-            onClick={() => setSelectedJob(row)}
-            className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 transition-all duration-200 hover:scale-105"
-          >
-            <Eye size={16} />
-          </button>
+  /* --- Column Definition (responsive) -------------------- */
+const columns = [
+  /* 1 ▸ Job / Company  ---------------------------------- */
+  {
+    name: 'Job',
+    selector: row => row.title,
+    sortable: true,
+    wrap: true,
+    minWidth: '220px',          // shrinks, but never below 220 px
+    cell: row => (
+      <div className="py-1">
+        <p className="font-semibold text-gray-900 text-sm leading-tight">
+          {row.title}
+        </p>
+        <p className="flex items-center gap-1 mt-0.5 text-xs text-gray-500">
+          <Building2 size={12} />
+          <span>{row.company}</span>
+        </p>
+      </div>
+    ),
+  },
 
-          {/* Apply for applicants */}
-          {user?.role === 'applicant' && (
-            <button
-              title="Apply Now"
-              onClick={() => setSelectedJob(row)}
-              className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-800 transition-all duration-200 hover:scale-105"
-            >
-              <Send size={16} />
-            </button>
-          )}
+  /* 2 ▸ Location  (hide on xs) -------------------------- */
+  {
+    name: 'Location',
+    selector: row => row.location,
+    sortable: true,
+    minWidth: '160px',
+    cell: row => (
+      <div className="flex items-center gap-1 text-sm text-gray-600">
+        <MapPin size={14} className="text-gray-400" />
+        <span>{row.location}</span>
+      </div>
+    ),
+    // hide this column on screens <640 px
+    reorder: true,   /* keep drag‑reorder support */
+    grow: 0,         /* don’t steal space on narrow view */
+    conditionalCellStyles: [
+      {
+        when: () => true,
+        style: { '@media(max-width: 639px)': { display: 'none' } },
+      },
+    ],
+  },
 
-          {/* Edit / Delete for owner or admin */}
-          {user && canEditDel(row) && (
-            <>
-              <button
-                title="Edit Job"
-                onClick={() => openEdit(row)}
-                className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 hover:bg-green-200 text-green-600 hover:text-green-800 transition-all duration-200 hover:scale-105"
-              >
-                <Edit size={16} />
-              </button>
-              <button
-                title="Delete Job"
-                onClick={() => handleDelete(row._id)}
-                className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-800 transition-all duration-200 hover:scale-105"
-              >
-                <Trash2 size={16} />
-              </button>
-            </>
-          )}
-        </div>
-      ),
-    },
-  ]
+  /* 3 ▸ Daily Salary ------------------------------------ */
+  {
+    name: 'Salary / day',
+    selector: row => row.salary,
+    sortable: true,
+    right: true,
+    minWidth: '120px',
+    cell: row => (
+      <span className="text-sm font-medium text-green-700">
+        {formatSalary(row.salary)}
+      </span>
+    ),
+  },
+
+  /* 4 ▸ Posted (hide on xs) ----------------------------- */
+  {
+    name: 'Posted',
+    selector: row => row.datePosted,
+    sortable: true,
+    right: true,
+    minWidth: '110px',
+    cell: row => (
+      <span className="text-sm text-gray-600">
+        {formatDate(row.datePosted)}
+      </span>
+    ),
+    conditionalCellStyles: [
+      {
+        when: () => true,
+        style: { '@media(max-width: 639px)': { display: 'none' } },
+      },
+    ],
+  },
+
+  /* 5 ▸ Actions (flex‑grow so it always fits) ----------- */
+  {
+    name: '',
+    allowOverflow: true,        // don’t clip icons
+    button: true,
+    grow: 2,                    // take leftover space
+    cell: row => (
+      <div className="flex flex-wrap lg:flex-nowrap items-center gap-1">
+        {/* View */}
+        <ActionIcon
+          title="View Details"
+          icon={Eye}
+          onClick={() => setSelectedJob(row)}
+        />
+
+        {/* Apply */}
+        {user?.role === 'applicant' && (
+          <ActionIcon
+            title="Apply Now"
+            icon={Send}
+            iconClass="text-blue-600 hover:text-blue-800"
+            bg="blue"
+            onClick={() => setApplyingJob(row)}
+          />
+        )}
+
+        {/* Edit / Delete */}
+        {user && canEditDel(row) && (
+          <>
+            <ActionIcon
+              title="Edit Job"
+              icon={Edit}
+              iconClass="text-green-600 hover:text-green-800"
+              bg="green"
+              onClick={() => openEdit(row)}
+            />
+            <ActionIcon
+              title="Delete Job"
+              icon={Trash2}
+              iconClass="text-red-600 hover:text-red-800"
+              bg="red"
+              onClick={() => handleDelete(row._id)}
+            />
+          </>
+        )}
+      </div>
+    ),
+  },
+]
+
+/* --- Little helper for 32‑line DRYness ----------------- */
+const ActionIcon = ({ title, icon: Icon, bg, iconClass='', onClick }) => (
+  <button
+    title={title}
+    onClick={onClick}
+    className={`
+      inline-flex items-center justify-center w-8 h-8 rounded-full
+      bg-${bg ? bg + '-100' : 'gray-100'} hover:bg-${bg ? bg + '-200' : 'gray-200'}
+      ${iconClass} transition duration-200 transform hover:scale-105
+    `}
+  >
+    <Icon size={16} />
+  </button>
+)
 
 
   /* ─── Render ──────────────────── */
@@ -266,16 +304,20 @@ export default function JobTable({ openEdit, compact = false }) {
 
       {/* Detail modal */}
       {selectedJob && (
-        <JobDetailModal job={selectedJob} onClose={() => setSelectedJob(null)} />
-      )}
+  <JobDetailModal
+    job={selectedJob}
+    onClose={() => setSelectedJob(null)}
+  />
+)}
 
-      {selectedJob && (
-        <ApplicationModal
-            job={selectedJob}
-            onClose={() => setSelectedJob(null)}
-            onSuccess={fetchJobs}   // optional refresh
-        />
-        )}
+{applyingJob && (
+  <ApplicationModal
+    job={applyingJob}
+    onClose={() => setApplyingJob(null)}
+    onSuccess={fetchJobs}
+  />
+)}
+
     </div>
   )
 }
