@@ -15,9 +15,10 @@ import Register from './pages/Register'
 import MyApplications from './pages/MyApplications'
 import ProtectedRoute from './components/ProtectedRoute'
 import Dashboard from './pages/Dashboard'
+import PostedJobs from './pages/PostedJobs'
 import './index.css'
 import VHireLogo from './assets/VCHire_logo.png'
-import config from './config'
+
 
 
 function Nav({ user, setUser }) {
@@ -81,6 +82,8 @@ function Nav({ user, setUser }) {
           {navLink('/jobs',       'Jobs',      <Briefcase className="h-4 w-4" />)}
           {user.role === 'applicant' &&
             navLink('/my-applications', 'Applications', <FileText className="h-4 w-4" />)}
+          {user.role === 'employer' &&
+            navLink('/posted-jobs', 'Posted Jobs', <FileText className="h-4 w-4" />)}
         </>
       ) : null}
     </nav>
@@ -136,6 +139,8 @@ function Nav({ user, setUser }) {
             {navLink('/jobs', 'Jobs', <Briefcase className="h-4 w-4" />)}
             {user.role === 'applicant' &&
               navLink('/my-applications', 'Applications', <FileText className="h-4 w-4" />)}
+            {user.role === 'employer' &&
+              navLink('/posted-jobs', 'Posted Jobs', <FileText className="h-4 w-4" />)}
             <button
               onClick={handleLogout}
               className="mt-3 flex items-center gap-2 bg-red-500/90 hover:bg-red-600 px-4 py-2 rounded-md text-white"
@@ -207,6 +212,8 @@ function App() {
               <Route path="/login" element={<Login setUser={setUser} />} />
               <Route path="/register" element={<Register setUser={setUser} />} />
               <Route path="/my-applications" element={<MyApplications />} />
+              <Route path="/posted-jobs" element={<PostedJobs />} />
+
               <Route
                 path="/dashboard"
                 element={

@@ -1,6 +1,7 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
 import Application from '../models/Application.js'
+import Job from '../models/Job.js'
 import upload from '../middleware/upload.js'
 const router = express.Router()
 
@@ -27,7 +28,7 @@ router.post('/:jobId', authMiddleware, upload.single('resume'), async (req, res)
     const application = new Application({
       jobId: req.params.jobId,
       applicantId: req.user.id,
-      resumePath: req.file?.path,   // save file path
+      resumePath: req.file?.path.replace(/\\/g, '/')
     })
 
     await application.save()
@@ -61,4 +62,25 @@ router.get('/my', authMiddleware, async (req, res) => {
   }
 })
 
+// GET /api/employer/applications
+router.get('/employer/applications', authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== 'employer') {
+      return res.status(403).json({ message: 'Only employers can view this' })
+    }
+
+    const jobs = await Job.find({ postedBy: req.user.id })
+    const jobIds = jobs.map(j => j._id)
+
+    const applications = await Application.find({ jobId: { $in: jobIds } })
+      .populate('jobId')
+      .populate('applicantId')
+
+    res.json(applications)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+  
 export default router

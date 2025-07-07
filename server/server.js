@@ -6,16 +6,19 @@ import dotenv from 'dotenv'
 import authRoutes from './routes/Auth.js'
 import jobRoutes from './routes/Job.js'
 import applicationRoutes from './routes/Application.js'
-
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 dotenv.config()
 
 const app = express()
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 // Middleware
 app.use(cors())
 app.use(express.json())
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 // Debug: check env
 console.log('✅ Mongo URI:', process.env.MONGO_URI)
 
